@@ -1,20 +1,18 @@
 # TransLLMate
+Simple ***local translation*** mod. Does not need anything but serving a local\* LLM for translation
+- \* - through local/remote OpenAI-compatible API
+## Usage
 > [!CAUTION]
 > 1. LLMs can provide inaccurate translations or lie - be careful and check for mistakes. Especially when they have less than 7B parameters
 > 2. LLMs can get tricked using specific prompts so that they'll reply with something else entirely.
 > 3. The Large Language Models greatly consume resources, so I'd recommend to get:
 > - 16 GB of RAM (these sticks are not *that* cheap as of time of writing this README)
 > - A CPU with AVX2 instructions and 2+ hyper-threaded cores should be enough
-> - You can also use a GPU as well - make sure model fits into VRAM
-> - Don't try inferencing LLMs on laptops🥀
-Simple ***local translation*** mod. Does not need anything but serving a local\* LLM for translation
-- \* - through local/remote OpenAI-compatible API
-Depends on YACL for configuration stuff
-## Usage
-1. Open chat in a multiplayer server
-2. Shift-Click other's message, then wait for the magic
+> Just don't try inferencing LLMs on laptops🥀
+1. Open chat (and, maybe, send a message)
+2. Shift-Click message you want to translate, then wait for the magic
 ## Configuration
-Accesible through Mod Menu and `/transllmate` command
+Accesible through Mod Menu and `/transllmate` command. 
 The options should be self-explanatory enough
 ## Tested models
 - `gemma3-4b` - OK-ish accuracy
@@ -27,7 +25,5 @@ The options should be self-explanatory enough
 2. Extract the archive and open Terminal (don't forget to `cd` to the same folder with llama.cpp tools)
 3. `./llama-server -hf user/model -fa on --port 1234 -t 2 -c 1024` to download the model from Hugging Face and run llama.cpp server
 - `-hf` is for downloading a model from Hugging face. If you have a local model, just point to it with `-m` as location instead of `-hf`.
-> [!TIP]
-> Only GGUF files are accepted by llama.cpp. And please, pick the right quantization of a model for your hardware
 4. Go to `localhost:1234` in your browser to ensure the server is up.
 5. Try translating a message from a running Minecraft instance. If API works, the message should be translated without errors.
