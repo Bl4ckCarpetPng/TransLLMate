@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "transllmate",
+	"version": "${version}",
+	"name": "TransLLMate",
+	"description": "Translate messages using LLMs (worst investment into APIs btw)",
+	"authors": ["black car"],
+	"contact": {"homepage": "https://github.com/Bl4ckCarpetPng/TransLLMate"},
+	"license": "GPLv3",
+	"icon": "assets/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": ["blackcar.transllmate.TransLLMate"],
+		"client": ["blackcar.transllmate.TransLLMateClient"],
+		"modmenu": ["blackcar.transllmate.config.ModMenuIntegration"]
+	},
+	"mixins": [
+		"transllmate.mixins.json",
+		{
+			"config": "transllmate.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*",
+		"yet_another_config_lib_v3": ">=3.8.2+1.21.11-fabric"
+	}
+}
