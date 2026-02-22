@@ -16,7 +16,6 @@
 */
 
 package blackcar.transllmate;
-import blackcar.transllmate.config.ModMenuIntegration;
 import blackcar.transllmate.config.TransLLMateConfig;
 
 import net.minecraft.client.Minecraft;
@@ -27,12 +26,12 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 public class TransLLMateClient implements ClientModInitializer {
 	@Override // Just one command. Really.
 	public void onInitializeClient() {
-		TransLLMateConfig.HANDLER.load();TransLLMateConfig.HANDLER.save();
+		TransLLMateConfig.CONFIG.load();
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
 			dispatcher.register(ClientCommandManager.literal("transllmate")
 				.executes(context -> {
 					Minecraft mc = Minecraft.getInstance();
-					mc.execute(() -> mc.setScreen(ModMenuIntegration.createConfigScreen(mc.screen)));
+					mc.execute(() -> mc.setScreen(TransLLMateConfig.createConfigScreen(mc.screen)));
 					return 1;
 				})));
 	}

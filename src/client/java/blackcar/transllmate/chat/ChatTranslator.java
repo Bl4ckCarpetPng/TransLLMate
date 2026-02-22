@@ -17,47 +17,65 @@
 
 package blackcar.transllmate.chat;
 import blackcar.transllmate.config.TransLLMateConfig;
-import blackcar.transllmate.llm.LocalLlmClient;
+import blackcar.transllmate.LocalTranslator;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import java.util.Random;
 
 public final class ChatTranslator {
+	public static final String modPf="[TransLLMate] "; // chat prefix
+	private static final String[] urlPrefix = {// local prefixes
+		"127.0.0.1", // localhost
+		"192.168.", // local
+		"172.", // also local
+		"0.", // localhost
+		"localhost"
+	};
+	private static final String[] j={// in case of broken ip/domain
+		"Would you like to ChatGPT yourself?",
+		"Your API is too spicy to be used.",
+		"This API scares me!",
+		"i cant internet\ni cant internet",
+		"This mod doesn't have to be bound to online API",
+		"Hello, API stranger! You've picked a wrong server. Please use a local one"
+	};
+	private static int l=0; // counter
 	private ChatTranslator(){}
 
 	public static void translate(GuiMessage message) {
+		Random random = new Random();
 		TransLLMateConfig config = TransLLMateConfig.get();
-		if(!config.enabled)return; // mod enabled by default, if disabled then annoy less
+		if(!config.enabled)return; // mod is enabled by default, if disabled then annoy less
+
+		//if(config.api.endsWith(".local")) l++; // the only way of tricking it is custom DNS
+		for (String s:urlPrefix) {if(config.api.startsWith(s)) l++;} // 0 = bad, more = good
+
+		if(l==0) {// very good protection trust me 
+			localSend(modPf+j[random.nextInt(j.length)], ChatFormatting.GRAY);
+			return;
+		}
 
 		ChatMessageSelector.ParsedChatMessage parsed = ChatMessageSelector.parse(message.content());
 		if (parsed == null || parsed.message().isBlank()){
-		postSystemMessage("[TransLLMate] Parsing failed.", ChatFormatting.RED);return;}
+		localSend(modPf+"Parsing failed.", ChatFormatting.RED);return;}
 
 		Minecraft minecraft = Minecraft.getInstance();
-		if (minecraft.player != null) {
-			String localName = minecraft.player.getName().getString();
-			if (parsed.playerName()==localName){
-			postSystemMessage("[TransLLMate] You cannot translate yourself.", ChatFormatting.RED);return;}
-		}
+		// this could be a broken checker, but something stole it
 
-		LocalLlmClient.translate(parsed.message(), config)
+		LocalTranslator.process(parsed.message(), config) // only after determining that we're not wasting water we can proceed
 			.thenAccept(translation -> minecraft.execute(() ->
-				postTranslation(parsed.playerName(), translation)))
+				localSend(modPf+"<"+parsed.playerName()+"> "+translation.trim(), ChatFormatting.GREEN)))
 			.exceptionally(ex -> {
-				minecraft.execute(() -> postSystemMessage("[TransLLMate] Translation failed: "+ex.getMessage(), ChatFormatting.RED));
+				minecraft.execute(() -> localSend(modPf+"Translation failed: "+ex.getMessage(), ChatFormatting.RED));
 				return null;
 			});
 	}
 
-	private static void postTranslation(String playerName, String translation) {
-		String message = "[TransLLMate] <"+playerName+"> "+translation.trim();
-		postSystemMessage(message, ChatFormatting.GREEN);
-	}
-
-	private static void postSystemMessage(String message, ChatFormatting color) {
-		Minecraft minecraft = Minecraft.getInstance();
-		minecraft.gui.getChat().addMessage(Component.literal(message).withStyle(color));
+	private static void localSend(String message, ChatFormatting color) {
+		Minecraft mc = Minecraft.getInstance();
+		mc.gui.getChat().addMessage(Component.literal(message).withStyle(color));
 	}
 }

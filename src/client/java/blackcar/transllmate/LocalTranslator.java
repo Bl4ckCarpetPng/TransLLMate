@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package blackcar.transllmate.llm;
+package blackcar.transllmate;
 import blackcar.transllmate.config.TransLLMateConfig;
 
 import com.google.gson.Gson;
@@ -37,7 +37,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public final class LocalLlmClient {
+public final class LocalTranslator {
 	private static final String genError = "Error while processing a request: "; // it's a bad idea to leave it like this but still
 	private static final Gson GSON = new Gson();
 
@@ -48,46 +48,43 @@ public final class LocalLlmClient {
 		.build();
 
 	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor(r -> {
-		Thread thread = new Thread(r, "TransLLMate-LLM");
+		Thread thread = new Thread(r, "TransLLMate-lm");
 		thread.setDaemon(true);
 		return thread;
 	});
-	private LocalLlmClient(){}
+	private LocalTranslator(){}
 
 	// Building context
-	private static String wrapText(String s){return "<TEXT_DELIMITER>"+s+"</TEXT_DELIMITER>";}
 	private static JsonObject message(String role, String content) {
 		JsonObject message = new JsonObject();
 		message.addProperty("role", role);
 		message.addProperty("content", content);
 		return message;
 	}
-	private static JsonArray buildMessages(String sysprompt, String text) {
+	private static JsonArray buildMessages(String sysprompt, String txt) {
 		JsonArray messages = new JsonArray();
 		messages.add(message("system", sysprompt));
-		messages.add(message("user", wrapText(text)));
+		messages.add(message("user", "<TEXT_DELIMITER>"+txt+"</TEXT_DELIMITER>"));
 		return messages;
 	}
 
+	// main
+	public static CompletableFuture<String> process(String text, TransLLMateConfig config) {
+		JsonObject body = new JsonObject();
+		body.addProperty("model", config.model);
+		body.add("messages", buildMessages(config.systemPrompt.replace("{language}", config.targetLang), text));
+		body.addProperty("temperature", config.temperature);
 
-	public static CompletableFuture<String> translate(String text, TransLLMateConfig config) {
-		String systemPrompt = config.systemPrompt.replace("{language}", config.preferredLanguage);
-
-		JsonObject payload = new JsonObject();
-		payload.addProperty("model", config.model);
-		payload.add("messages", buildMessages(systemPrompt, text));
-		payload.addProperty("temperature", config.temperature);
-
-		HttpRequest.Builder builder = HttpRequest.newBuilder()
-			.uri(URI.create(config.apiUrl))
-			.timeout(Duration.ofSeconds(config.timeoutSeconds))
+		HttpRequest.Builder req = HttpRequest.newBuilder()
+			.uri(URI.create("http://"+config.api+"/v1/chat/completions")) // http is fine for local deployments
+			.timeout(Duration.ofSeconds(30))
 			.header("Content-Type","application/json")
-			.POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(payload)));
+			.POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(body)));
 
-		if(!config.apiKey.isBlank())builder.header("Authorization","Bearer "+config.apiKey);
+		if(!config.key.isBlank())req.header("Authorization","Bearer "+config.key);
 
-		HttpRequest req = builder.build();
-		return CompletableFuture.supplyAsync(() -> send(req), EXECUTOR);
+		HttpRequest wReq = req.build();
+		return CompletableFuture.supplyAsync(() -> send(wReq), EXECUTOR);
 	}
 	private static String send(HttpRequest req) {
 		try {
@@ -101,7 +98,7 @@ public final class LocalLlmClient {
 			Thread.currentThread().interrupt();
 			throw new RuntimeException(genError+"interrupted",e);
 		} catch (IOException e) {
-			throw new RuntimeException(genError+"REQFAIL:"+e.getMessage(),e);
+			throw new RuntimeException(genError+"Make sure you have LLM server up and running.",e);
 		}
 	}
 

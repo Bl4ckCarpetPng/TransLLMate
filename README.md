@@ -1,6 +1,5 @@
 # TransLLMate
-Simple ***local translation*** mod. Does not need anything but serving a local\* LLM for translation
-- \* - through local/remote OpenAI-compatible API
+The ***local translation*** mod. Does not need anything but serving a local LLM for translation
 ## Usage
 > [!CAUTION]
 > 1. LLMs can provide inaccurate translations or lie - be careful and check for mistakes. Especially when they have less than 7B parameters
@@ -9,6 +8,7 @@ Simple ***local translation*** mod. Does not need anything but serving a local\*
 > - 16 GB of RAM (these sticks are not *that* cheap as of time of writing this README)
 > - A CPU with AVX2 instructions and 2+ hyper-threaded cores should be enough
 > Just don't try inferencing LLMs on laptops🥀
+> 4. Only local API endpoints work.
 1. Open chat (and, maybe, send a message)
 2. Shift-Click message you want to translate, then wait for the magic
 ## Configuration
@@ -19,8 +19,10 @@ The options should be self-explanatory enough
 - `gemma3-12b` - Good accuracy at expense of compute and RAM
 - `qwen3-4b` - Overall bad accuracy, may understand Chinese better than any other language
 - `Maybe some other model[s]?`
-## Simple example of serving an LLM for mod using llama.cpp
-### Skip it if you use LM Studio or other software/API
+
+## Other stuff
+### Simple example of serving an LLM for mod using llama.cpp
+#### Skip it if you use LM Studio or other software/API
 1. Head over to https://github.com/ggml-org/llama.cpp/releases and download CPU variant of llama.cpp tools for your platform.
 2. Extract the archive and open Terminal (don't forget to `cd` to the same folder with llama.cpp tools)
 3. `./llama-server -hf user/model -fa on --port 1234 -t 2 -c 1024` to download the model from Hugging Face and run llama.cpp server
