@@ -18,6 +18,7 @@ The options should be self-explanatory enough
 - `gemma3-4b` - OK-ish accuracy
 - `gemma3-12b` - Good accuracy at expense of compute and RAM
 - `qwen3-4b` - Overall bad accuracy, may understand Chinese better than any other language
+- `qwen3.5-9b` - Loops in thinking mode, therefore `idk` accuracy for now
 - `Maybe some other model[s]?`
 
 ## Other stuff

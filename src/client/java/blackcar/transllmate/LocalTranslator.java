@@ -61,7 +61,7 @@ public final class LocalTranslator {
 		message.addProperty("content", content);
 		return message;
 	}
-	private static JsonArray buildMessages(String sysprompt, String txt) {
+	private static JsonArray buildContext(String sysprompt, String txt) {
 		JsonArray messages = new JsonArray();
 		messages.add(message("system", sysprompt));
 		messages.add(message("user", "<TEXT_DELIMITER>"+txt+"</TEXT_DELIMITER>"));
@@ -72,8 +72,8 @@ public final class LocalTranslator {
 	public static CompletableFuture<String> process(String text, TransLLMateConfig config) {
 		JsonObject body = new JsonObject();
 		body.addProperty("model", config.model);
-		body.add("messages", buildMessages(config.systemPrompt.replace("{language}", config.targetLang), text));
 		body.addProperty("temperature", config.temperature);
+		body.add("messages", buildContext(config.systemPrompt.replace("{language}", config.targetLang), text));
 
 		HttpRequest.Builder req = HttpRequest.newBuilder()
 			.uri(URI.create("http://"+config.api+"/v1/chat/completions")) // http is fine for local deployments

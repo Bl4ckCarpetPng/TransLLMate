@@ -99,7 +99,7 @@ public class TransLLMateConfig {
                     .option(Option.<String>createBuilder(String.class)
                         .name(Component.literal("Target Language"))
                         .description(OptionDescription.createBuilder()
-                            .text(Component.literal("Target language for translations. Use plain text for it and model will translate to that language\n\nTip: you can also type name of language in any language lol"))
+                            .text(Component.literal("Target language for translations. Use plain text for it and model will translate to that language\n\nTip: you can also type name in any language lol"))
                             .build())
                         .binding(defaults.targetLang, () -> config.targetLang, v -> config.targetLang = v)
                         .controller(StringControllerBuilder::create)

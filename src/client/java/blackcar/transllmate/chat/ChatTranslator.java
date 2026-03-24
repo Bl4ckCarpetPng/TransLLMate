@@ -50,7 +50,7 @@ public final class ChatTranslator {
 		TransLLMateConfig config = TransLLMateConfig.get();
 		if(!config.enabled)return; // mod is enabled by default, if disabled then annoy less
 
-		//if(config.api.endsWith(".local")) l++; // the only way of tricking it is custom DNS
+		if(config.api.endsWith(".local")) l++; // the only way of tricking it is custom DNS
 		for (String s:urlPrefix) {if(config.api.startsWith(s)) l++;} // 0 = bad, more = good
 
 		if(l==0) {// very good protection trust me 
@@ -60,16 +60,14 @@ public final class ChatTranslator {
 
 		ChatMessageSelector.ParsedChatMessage parsed = ChatMessageSelector.parse(message.content());
 		if (parsed == null || parsed.message().isBlank()){
-		localSend(modPf+"Parsing failed.", ChatFormatting.RED);return;}
+		localSend(modPf+"Parsing failed - nothing useful was found in message.", ChatFormatting.RED);return;}
 
-		Minecraft minecraft = Minecraft.getInstance();
-		// this could be a broken checker, but something stole it
-
+		Minecraft mc = Minecraft.getInstance();
 		LocalTranslator.process(parsed.message(), config) // only after determining that we're not wasting water we can proceed
-			.thenAccept(translation -> minecraft.execute(() ->
+			.thenAccept(translation -> mc.execute(() ->
 				localSend(modPf+"<"+parsed.playerName()+"> "+translation.trim(), ChatFormatting.GREEN)))
 			.exceptionally(ex -> {
-				minecraft.execute(() -> localSend(modPf+"Translation failed: "+ex.getMessage(), ChatFormatting.RED));
+				mc.execute(() -> localSend(modPf+"Translation failed: "+ex.getMessage(), ChatFormatting.RED));
 				return null;
 			});
 	}
