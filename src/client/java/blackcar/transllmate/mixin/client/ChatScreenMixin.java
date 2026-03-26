@@ -19,7 +19,7 @@ package blackcar.transllmate.mixin.client;
 import blackcar.transllmate.chat.ChatMessageSelector;
 import blackcar.transllmate.chat.ChatTranslator;
 
-import net.minecraft.client.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.input.MouseButtonEvent;

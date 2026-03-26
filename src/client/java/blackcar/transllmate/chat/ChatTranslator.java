@@ -20,7 +20,7 @@ import blackcar.transllmate.config.TransLLMateConfig;
 import blackcar.transllmate.LocalTranslator;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import java.util.Random;
@@ -74,6 +74,6 @@ public final class ChatTranslator {
 
 	private static void localSend(String message, ChatFormatting color) {
 		Minecraft mc = Minecraft.getInstance();
-		mc.gui.getChat().addMessage(Component.literal(message).withStyle(color));
+		mc.gui.getChat().addClientSystemMessage(Component.literal(message).withStyle(color));
 	}
 }

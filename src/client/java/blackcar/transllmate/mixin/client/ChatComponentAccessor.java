@@ -17,7 +17,7 @@
 
 package blackcar.transllmate.mixin.client;
 
-import net.minecraft.client.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.gui.components.ChatComponent;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,9 +36,6 @@ public interface ChatComponentAccessor {
 
 	@Accessor("chatScrollbarPos")
 	int transllmate$getChatScrollbarPos();
-
-	@Invoker("isChatHidden")
-	boolean transllmate$invokeIsChatHidden();
 
 	@Invoker("getScale")
 	double transllmate$invokeGetScale();

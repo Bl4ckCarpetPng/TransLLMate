@@ -22,11 +22,11 @@ import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
-import dev.isxander.yacl3.api.controller.DoubleFieldControllerBuilder;
 import dev.isxander.yacl3.api.controller.StringControllerBuilder;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
+import dev.isxander.yacl3.gui.controllers.slider.DoubleSliderController;
 import dev.isxander.yacl3.platform.YACLPlatform;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -118,7 +118,7 @@ public class TransLLMateConfig {
                             .text(Component.literal("Creativity level.\n0.1 - minimal, least creative\n2 - max, most creative"))
                             .build())
                         .binding(defaults.temperature, () -> config.temperature, v -> config.temperature = v)
-                        .controller(DoubleFieldControllerBuilder::create)
+                        .customController(opt -> new DoubleSliderController(opt, 0, 2, 0.01))
                         .build())
                     .build())
                 .build())

@@ -1,7 +1,7 @@
 package blackcar.transllmate.chat;
 
 import blackcar.transllmate.mixin.client.ChatComponentAccessor;
-import net.minecraft.client.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
@@ -55,7 +55,7 @@ public final class ChatMessageSelector {
 		List<GuiMessage.Line> trimmedMessages,
 		double mouseX, double mouseY
 	) {
-		if (!chat.isChatFocused() || accessor.transllmate$invokeIsChatHidden())return -1;
+		if (!chat.isChatFocused())return -1;
 
 		double scale = accessor.transllmate$invokeGetScale();
 		double chatX = mouseX / scale - 4.0;

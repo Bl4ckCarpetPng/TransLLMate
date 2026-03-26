@@ -20,15 +20,14 @@ import blackcar.transllmate.config.TransLLMateConfig;
 
 import net.minecraft.client.Minecraft;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.*;
 
 public class TransLLMateClient implements ClientModInitializer {
 	@Override // Just one command. Really.
 	public void onInitializeClient() {
 		TransLLMateConfig.CONFIG.load();
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-			dispatcher.register(ClientCommandManager.literal("transllmate")
+			dispatcher.register(ClientCommands.literal("transllmate")
 				.executes(context -> {
 					Minecraft mc = Minecraft.getInstance();
 					mc.execute(() -> mc.setScreen(TransLLMateConfig.createConfigScreen(mc.screen)));
