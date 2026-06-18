@@ -35,8 +35,8 @@ The options should be self-explanatory enough
 #### Skip it if you use LM Studio or other software/API
 1. Head over to https://github.com/ggml-org/llama.cpp/releases and download Vulkan variant of llama.cpp tools for your platform.
 2. Extract the archive and open Terminal (don't forget to `cd` to the same folder with llama.cpp tools)
-3. `./llama-server -hf user/model -fa on --port 1234 -t 2 -c 1024 -rea off` to download the model from Hugging Face and run llama.cpp server
+3. `./llama-server -hf user/model -fa on --port 1234 -t 2 -c 1024` to download the model from Hugging Face and run llama.cpp server
 - `-hf` is for downloading a model from Hugging face. If you have a local model, just point to it with `-m` as location instead of `-hf`.
-- Use `./llama-server -hf user/model -fa on --port 1234 -t 0 -ngl 99 -c 1024 -rea off` if you have a graphics card that can fit the entire model
+- Use `./llama-server -hf user/model -fa on --port 1234 -t 0 -ngl 99 -c 1024` if you have a graphics card that can fit the entire model
 4. Go to `localhost:1234` in your browser to ensure the server is up.
 5. Try translating a message from a running Minecraft instance. If API works, the message should be translated without errors.
