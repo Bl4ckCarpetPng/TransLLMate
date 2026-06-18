@@ -115,7 +115,7 @@ public class TransLLMateConfig {
                     .option(Option.<Double>createBuilder(Double.class)
                         .name(Component.literal("Temperature"))
                         .description(OptionDescription.createBuilder()
-                            .text(Component.literal("Creativity level.\n0.1 - minimal, least creative\n2 - max, most creative"))
+                            .text(Component.literal("Creativity level.\n0.1 - minimal, least creative\n1 - max level, accepted by most endpoints\n2 - max+, most creative but most endpoint might not accept it"))
                             .build())
                         .binding(defaults.temperature, () -> config.temperature, v -> config.temperature = v)
                         .customController(opt -> new DoubleSliderController(opt, 0, 2, 0.01))
