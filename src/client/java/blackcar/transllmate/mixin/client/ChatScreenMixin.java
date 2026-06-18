@@ -39,7 +39,7 @@ public class ChatScreenMixin {
 		if (event.button() != 0 || !event.hasShiftDown()) return;
 
 		Minecraft minecraft = Minecraft.getInstance();
-		ChatComponent chat = minecraft.gui.getChat();
+		ChatComponent chat = minecraft.gui.hud.getChat();
 		Optional<GuiMessage> message = ChatMessageSelector.getMessageAt(chat, event.x(), event.y());
 		if (message.isEmpty()) return;
 

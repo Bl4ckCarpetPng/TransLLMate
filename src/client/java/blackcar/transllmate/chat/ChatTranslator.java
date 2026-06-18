@@ -74,6 +74,6 @@ public final class ChatTranslator {
 
 	private static void localSend(String message, ChatFormatting color) {
 		Minecraft mc = Minecraft.getInstance();
-		mc.gui.getChat().addClientSystemMessage(Component.literal(message).withStyle(color));
+		mc.gui.hud.getChat().addClientSystemMessage(Component.literal(message).withStyle(color));
 	}
 }

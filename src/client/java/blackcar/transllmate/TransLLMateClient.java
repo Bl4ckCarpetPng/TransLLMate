@@ -30,7 +30,7 @@ public class TransLLMateClient implements ClientModInitializer {
 			dispatcher.register(ClientCommands.literal("transllmate")
 				.executes(context -> {
 					Minecraft mc = Minecraft.getInstance();
-					mc.execute(() -> mc.setScreen(TransLLMateConfig.createConfigScreen(mc.screen)));
+					mc.execute(() -> mc.setScreenAndShow(TransLLMateConfig.createConfigScreen(mc.gui.screen())));
 					return 1;
 				})));
 	}
