@@ -73,6 +73,8 @@ public final class LocalTranslator {
 		JsonObject body = new JsonObject();
 		body.addProperty("model", config.model);
 		body.addProperty("temperature", config.temperature);
+		body.addProperty("reasoning_effort", "none"); // used to prevent thinking when possible
+		
 		body.add("messages", buildContext(config.systemPrompt.replace("{language}", config.targetLang), text));
 
 		HttpRequest.Builder req = HttpRequest.newBuilder()
