@@ -3,7 +3,7 @@
 	"id": "transllmate",
 	"version": "${version}",
 	"name": "TransLLMate",
-	"description": "Translate messages using self-hosted LLM",
+	"description": "Translate messages using self-hosted LLMs",
 	"authors": ["black car"],
 	"contact": {"homepage": "https://github.com/Bl4ckCarpetPng/TransLLMate"},
 	"license": "GPLv3",
