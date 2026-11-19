@@ -71,9 +71,9 @@ public final class LocalTranslator {
 	// main
 	public static CompletableFuture<String> process(String text, TransLLMateConfig config) {
 		JsonObject body = new JsonObject();
-		body.addProperty("model", config.model);
-		body.addProperty("temperature", config.temperature);
-		body.addProperty("reasoning_effort", "none"); // used to prevent thinking when possible
+		body.addProperty("model", config.model); // model
+		body.addProperty("temperature", config.temperature); // temperature
+		body.addProperty("thinking_budget_tokens", config.reasoningBudget); // thinking budget
 		
 		body.add("messages", buildContext(config.systemPrompt.replace("{language}", config.targetLang), text));
 
