@@ -40,6 +40,8 @@ public class TransLLMateConfig {
 		.build();
 
 	@SerialEntry public boolean enabled = true;
+	@SerialEntry public boolean isHttp = true;
+	@SerialEntry public boolean streaming = true;
 	@SerialEntry public String api = "localhost:1234"; // LM Studio default
 	@SerialEntry public String key = ""; // good trap
 	@SerialEntry public String model = "someModel";
@@ -73,6 +75,22 @@ public class TransLLMateConfig {
                     .build())
                 .group(OptionGroup.createBuilder()
                     .name(Component.literal("Interaction"))
+                    .option(Option.<Boolean>createBuilder(Boolean.class)
+                        .name(Component.literal("Use HTTP connection"))
+                        .description(OptionDescription.createBuilder()
+                            .text(Component.literal("Toggles between insecure and secure HTTP protocol. Leave it untouched if you don't know what is that"))
+                            .build())
+                        .binding(defaults.isHttp, () -> config.isHttp, v -> config.isHttp=v)
+                        .controller(BooleanControllerBuilder::create)
+                        .build())
+                    .option(Option.<Boolean>createBuilder(Boolean.class)
+                        .name(Component.literal("Streaming"))
+                        .description(OptionDescription.createBuilder()
+                            .text(Component.literal("Changes the way mod gets response from LLM.\n\nON - Best for long-lasting thinking\nOFF - when output is fast; may time out when not so fast"))
+                            .build())
+                        .binding(defaults.streaming, () -> config.streaming, v -> config.streaming=v)
+                        .controller(BooleanControllerBuilder::create)
+                        .build())
                     .option(Option.<String>createBuilder(String.class)
                         .name(Component.literal("API"))
                         .description(OptionDescription.createBuilder()
@@ -124,7 +142,7 @@ public class TransLLMateConfig {
                     .option(Option.<Integer>createBuilder(Integer.class)
                         .name(Component.literal("Reasoning Budget"))
                         .description(OptionDescription.createBuilder()
-                            .text(Component.literal("Maximum amount of tokens given for reasoning\n\n0 = Disabled\n16384 = maximum (slowest)\n\nUsual effort limits:\n512-1024 = low effort, least noticable positive effect\n2048 = medium effort, more noticable accuracy\n>4096 = higher effort, best accuracy at speed cost"))
+                            .text(Component.literal("Maximum amount of tokens given for reasoning\n\n0 = Disabled\n16384 = maximum (slowest)\n\nUsual effort limits:\n512-1024 = low effort, least noticable positive effect\n2048-6144 = medium effort, more noticable accuracy\n>8192 = higher effort, best accuracy at speed cost"))
                             .build())
                         .binding(defaults.reasoningBudget, () -> config.reasoningBudget, v -> config.reasoningBudget = v)
                         .customController(opt -> new IntegerSliderController(opt, 0, 16384, 512))

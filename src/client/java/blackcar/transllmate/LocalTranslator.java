@@ -23,13 +23,17 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.net.SocketAddress;
 import java.time.Duration;
 import java.util.List;
@@ -74,11 +78,14 @@ public final class LocalTranslator {
 		body.addProperty("model", config.model); // model
 		body.addProperty("temperature", config.temperature); // temperature
 		body.addProperty("thinking_budget_tokens", config.reasoningBudget); // thinking budget
+		body.addProperty("stream", config.streaming); // streaming
+
+		String addr = config.isHttp ? "http://":"https://";
 		
 		body.add("messages", buildContext(config.systemPrompt.replace("{language}", config.targetLang), text));
 
 		HttpRequest.Builder req = HttpRequest.newBuilder()
-			.uri(URI.create("http://"+config.api+"/v1/chat/completions")) // http is fine for local deployments
+			.uri(URI.create(addr+config.api+"/v1/chat/completions")) // http is fine for local deployments
 			.timeout(Duration.ofSeconds(30))
 			.header("Content-Type","application/json")
 			.POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(body)));
@@ -86,6 +93,8 @@ public final class LocalTranslator {
 		if(!config.key.isBlank())req.header("Authorization","Bearer "+config.key);
 
 		HttpRequest wReq = req.build();
+		if (config.streaming)
+            return CompletableFuture.supplyAsync(() -> sendStreaming(wReq), EXECUTOR);
 		return CompletableFuture.supplyAsync(() -> send(wReq), EXECUTOR);
 	}
 	private static String send(HttpRequest req) {
@@ -103,6 +112,79 @@ public final class LocalTranslator {
 			throw new RuntimeException(genError+"Make sure you have LLM server up and running.",e);
 		}
 	}
+
+	private static String sendStreaming(HttpRequest req) {
+    try {
+        HttpResponse<InputStream> response = HTTP.send(req, HttpResponse.BodyHandlers.ofInputStream());
+
+        if (response.statusCode() / 100 != 2) {
+            String errorBody = new String(
+                response.body().readAllBytes(),
+                StandardCharsets.UTF_8
+            );
+
+            throw new IOException(
+                genError+"Request failed with HTTP "+
+                response.statusCode()+"\nbody: "+
+                truncate(errorBody, 400)
+            );
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                if (!line.startsWith("data:")) continue;
+
+                String data = line.substring(5).trim();
+                if ("[DONE]".equals(data)) break;
+
+                String chunk = extractStreamingContent(data);
+                if (chunk != null) result.append(chunk);
+            }
+        }
+
+        return result.toString().trim();
+
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException(genError+"interrupted", e);
+    } catch (IOException e) {
+        throw new RuntimeException(genError+"Make sure you have LLM server up and running.", e);
+    }
+}
+
+    private static String extractStreamingContent(String json) {
+        JsonObject root = JsonParser
+            .parseString(json)
+            .getAsJsonObject();
+
+        if (root.has("error")) {
+            JsonObject error = root.getAsJsonObject("error");
+
+            String message =
+                error != null && error.has("message")
+                    ? error.get("message").getAsString()
+                    : "Generation error";
+
+            throw new RuntimeException(message);
+        }
+
+        JsonArray choices = root.getAsJsonArray("choices");
+        if (choices == null || choices.isEmpty()) return null;
+
+        JsonObject choice = choices.get(0).getAsJsonObject();
+        JsonObject delta = choice.getAsJsonObject("delta");
+
+        if (delta == null || // nothing when it's not streaming,
+            !delta.has("content") || // when it's reasoning content
+            delta.get("content").isJsonNull()) // or when there's null token
+            return null;
+
+        return delta.get("content").getAsString();
+    }
 
 	private static String extractContent(String body) {
 		JsonObject root = JsonParser.parseString(body).getAsJsonObject();
