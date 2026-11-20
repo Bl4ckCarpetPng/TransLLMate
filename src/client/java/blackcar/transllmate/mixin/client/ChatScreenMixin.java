@@ -36,7 +36,7 @@ import java.util.Optional;
 public class ChatScreenMixin {
 	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
 	private void transllmate$mouseClicked(MouseButtonEvent event, boolean bl, CallbackInfoReturnable<Boolean> cir) {
-		if (event.button() != 0 || !event.hasShiftDown()) return;
+		if (event.button() != 1 || !event.hasShiftDown()) return;
 
 		Minecraft minecraft = Minecraft.getInstance();
 		ChatComponent chat = minecraft.gui.hud.getChat();
